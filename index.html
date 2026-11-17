@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Release Watcher</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    textarea, input { width: 100%; box-sizing: border-box; padding: .6rem; margin: .4rem 0; font: inherit; }
+    textarea { height: 280px; font-family: monospace; }
+    button { padding: .6rem 1.2rem; font: inherit; cursor: pointer; }
+    #msg { margin-top: .8rem; min-height: 1.2rem; }
+  </style>
+</head>
+<body>
+  <h1>Release Watcher</h1>
+  <input id="pw" type="password" placeholder="Password">
+  <textarea id="list" placeholder="One repo per line&#10;owner/repo or https://github.com/owner/repo"></textarea>
+  <button id="load">Load</button>
+  <button id="save">Save</button>
+  <div id="msg"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    $("pw").value = localStorage.getItem("pw") || "";
+
+    const headers = () => ({
+      "content-type": "application/json",
+      authorization: "Bearer " + $("pw").value,
+    });
+
+    async function load() {
+      const r = await fetch("/api/repos", { headers: headers() });
+      if (!r.ok) return ($("msg").textContent = "Error: " + r.status);
+      localStorage.setItem("pw", $("pw").value);
+      $("list").value = (await r.json()).repos.join("\n");
+      $("msg").textContent = "Loaded.";
+    }
+
+    async function save() {
+      const repos = $("list").value.split("\n").filter(Boolean);
+      const r = await fetch("/api/repos", {
+        method: "POST", headers: headers(), body: JSON.stringify({ repos }),
+      });
+      if (!r.ok) return ($("msg").textContent = "Error: " + r.status);
+      localStorage.setItem("pw", $("pw").value);
+      const data = await r.json();
+      $("list").value = data.repos.join("\n");
+      $("msg").textContent = `Saved ${data.repos.length} repos.`;
+    }
+
+    $("load").onclick = load;
+    $("save").onclick = save;
+    if ($("pw").value) load();
+  </script>
+</body>
+</html>
