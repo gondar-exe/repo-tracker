@@ -9,11 +9,11 @@ run_worker_first = ["/api/*"]
 
 [[kv_namespaces]]
 binding = "WATCH_KV"
-id = "PASTE_KV_ID_HERE"
+id = "1c35ba2daeeb48c297b2090c2c80ec2d"
 
 [triggers]
 crons = ["*/10 * * * *"]
 
 [vars]
 VAPID_PUBLIC_KEY = "BPLmzIWZtMUJBwn1Y2pIkiOiBHnzXVA7WqANeCf80WG66eDUcNtbKf_bDYBZUSCVGZ2kaU1zA1Ic2Y8ytn9XXyQ"
-VAPID_SUBJECT = "mailto:marufit8@gmail.com"
+VAPID_SUBJECT = "mailto:gsm99.to@gmail.com"
